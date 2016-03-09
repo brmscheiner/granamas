@@ -8,9 +8,6 @@
 
   <body>
     <style>
-      @-webkit-keyframes anagramize {}
-      @keyframes anagramize {}
-
       .boo {
         display: inline-block;
         position: absolute;
@@ -18,12 +15,12 @@
     </style>
 
     <form id="initial-text-form">
-      <input id="initial-text" type="text" />
+      <textarea id="initial-text"></textarea>
       <button>ok</button>
     </form>
 
     <form id="final-text-form">
-      <input id="final-text" type="text" />
+      <textarea id="final-text"></textarea>
       <button>ok</button>
     </form>
 
@@ -48,14 +45,21 @@
         }
 
         getOffScreenCoords() {
-          if (Math.random() >= 0.5) {
-            let x = window.innerWidth + 20
-            let y = Math.random() * window.innerHeight
-            return [x,y]
+          let random = Math.random(),
+              xLeft = random * (window.innerWidth / 2) * -1,
+              xRight = (random * (window.innerWidth / 2)) + window.innerWidth,
+              yTop = random * (window.innerHeight / 2) * -1,
+              yBottom = (random * (window.innerHeight / 2)) + window.innerWidth
+
+          console.log(xLeft, xRight, yTop, yBottom)
+          if (random >= 0.75) {
+            return [xLeft, yTop]
+          } else if (random >= 0.5) {
+            return [xLeft, yBottom]
+          } else if (random >= 0.25) {
+            return [xRight, yBottom]
           } else {
-            let x = Math.random() * window.innerWidth
-            let y = window.innerHeight + 20
-            return [x,y]
+            return [xRight, yTop]
           }
         }
 
@@ -122,7 +126,7 @@
             this.allChars.push(this.getTransitionChar(
               initialCharObj.character,
               initialCharObj.left,
-              initialCharObj.left,
+              initialCharObj.top,
               offscreenCoords[0],
               offscreenCoords[1]
             ))
