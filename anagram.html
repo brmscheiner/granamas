@@ -11,6 +11,7 @@
       .boo {
         display: inline-block;
         position: absolute;
+        animation-timing-function: linear;
       }
     </style>
 
@@ -154,8 +155,10 @@
             let cssRules = styleSheets[1].cssRules
             styleSheets[1].insertRule("@keyframes animate" + i + "{}", cssRules.length)
             cssRules[cssRules.length - 1].appendRule("0% { left:" + char.x1 + "px; top: " + char.y1 + "px; }")
+            cssRules[cssRules.length - 1].appendRule("30% { left:" + Math.random() * window.innerWidth + "px; top: " + Math.random() * window.innerHeight + "px; }")
+            cssRules[cssRules.length - 1].appendRule("60% { left:" + Math.random() * window.innerWidth + "px; top: " + Math.random() * window.innerHeight + "px; }")
             cssRules[cssRules.length - 1].appendRule("100% { left:" + char.x2 + "px; top: " + char.y2 + "px; }")
-            charSpan.style.animationDuration = "2s"
+            charSpan.style.animationDuration = "1s"
             charSpan.style.animationName = "animate" + i
             charSpan.style.left = char.x2 + "px"
             charSpan.style.top = char.y2 + "px"
