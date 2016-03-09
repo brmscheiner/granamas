@@ -1,0 +1,14 @@
+<script>
+Anagram.initialize({
+ container: DOMElement,
+ states: {
+   "bio": "bananarama",
+   "about": "ramabanana"
+   "info": "bandanaroomba"
+ },
+ mode: "normal",
+ duration: 3 // in seconds
+})
+
+document.body.addEventListener("click", Anagram.animateTo(states["bio"]))
+</script>
