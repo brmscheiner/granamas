@@ -14,18 +14,19 @@
       "use strict"
 
       let anagram = new Anagram()
+
       anagram.initialize({
        container: document.getElementById("app"),
        states: {
          "bio": "bananarama",
-         "about": "ramabanana",
+         "about": "ram a banana",
          "info": "bandanaroomba"
        },
        mode: "normal",
        duration: 3 // in seconds
       })
 
-      document.body.addEventListener("click", anagram.animateTo(states["bio"]))
+      document.body.addEventListener("click", () => anagram.animateTo("bio"))
     </script>
   </body>
 </html>
