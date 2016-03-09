@@ -1,14 +1,31 @@
-<script>
-Anagram.initialize({
- container: DOMElement,
- states: {
-   "bio": "bananarama",
-   "about": "ramabanana"
-   "info": "bandanaroomba"
- },
- mode: "normal",
- duration: 3 // in seconds
-})
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href="index.css" rel="stylesheet" type="text/css" />
+    <script src="anagram.js"></script>
+    <title></title>
+  </head>
 
-document.body.addEventListener("click", Anagram.animateTo(states["bio"]))
-</script>
+  <body>
+    <div id="app">
+    </div>
+
+    <script>
+      "use strict"
+
+      let anagram = new Anagram()
+      anagram.initialize({
+       container: document.getElementById("app"),
+       states: {
+         "bio": "bananarama",
+         "about": "ramabanana",
+         "info": "bandanaroomba"
+       },
+       mode: "normal",
+       duration: 3 // in seconds
+      })
+
+      document.body.addEventListener("click", anagram.animateTo(states["bio"]))
+    </script>
+  </body>
+</html>
