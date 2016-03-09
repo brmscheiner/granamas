@@ -1,0 +1,215 @@
+<!set position absolute at the beginning when we access the xy positions of the characters >
+<!generate different css keyframes because right now all animations triggered within 2s are using the same block >
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href="index.css" rel="stylesheet" type="text/css" />
+    <title></title>
+  </head>
+
+  <body>
+    <style>
+      @-webkit-keyframes anagramize {}
+      @keyframes anagramize {}
+
+      .boo {
+        display: inline-block;
+        position: absolute;
+      }
+    </style>
+
+    <form id="initial-text-form">
+      <input id="initial-text" type="text" />
+      <button>ok</button>
+    </form>
+
+    <form id="final-text-form">
+      <input id="final-text" type="text" />
+      <button>ok</button>
+    </form>
+
+    <div id="text-display">
+    </div>
+
+    <script>
+      "use strict"
+
+      class Anagram {
+        constructor(initialText) {
+          this.initialText = initialText
+          this.allChars = []
+        }
+
+        getCharData(character, characterSpan) {
+          let charData = {}
+          charData.character = character
+          charData.left = characterSpan.offsetLeft
+          charData.top = characterSpan.offsetTop
+          return charData
+        }
+
+        getOffscreenX() {
+          if (Math.random() > 0.5) {
+            return window.innerWidth + 1
+          }
+          else {
+            return -1
+          }
+        }
+
+        getOffscreenY() {
+          if (Math.random() > 0.5) {
+            return window.innerHeight + 1
+          }
+          else {
+            return - 1
+          }
+        }
+
+        getOffScreenCoords() {
+          if (Math.random() > 0.5) {
+            let x = this.getOffscreenX()
+            let y = Math.random()*window.innerHeight
+            return [x,y]
+          } else {
+            let x = Math.random()*window.innerWidth
+            let y = this.getOffscreenY()
+            return [x,y]
+          }
+        }
+
+        getTransitionChar(character, x1, y1, x2, y2) {
+          let charData = {}
+          charData.character = character
+          charData.x1 = x1
+          charData.y1 = y1
+          charData.x2 = x2
+          charData.y2 = y2
+          return charData
+        }
+
+        processInitialChars(destination) {
+          destination.innerHTML = ''
+          let characterArray = (this.initialText).split('')
+          characterArray.forEach((character, i) => {
+            let characterSpan = this.displayChar(character, destination)
+            let finalCharObj = this.getCharData(character, characterSpan)
+            characterArray[i] = finalCharObj
+          })
+          this.initialTextData = characterArray
+        }
+
+        processFinalChars(destination) {
+          destination.innerHTML = ''
+          let characterArray = (this.finalText).split('')
+
+          characterArray.forEach((character, i) => {
+            let characterSpan = this.displayChar(character, destination)
+            let finalCharObj = this.getCharData(character, characterSpan)
+            characterArray[i] = finalCharObj
+            let found = false
+            this.initialTextData.forEach((initialCharObj, j) => {
+              if (initialCharObj.character === finalCharObj.character && found === false) {
+                found = true
+                this.allChars.push(this.getTransitionChar(
+                  finalCharObj.character,
+                  initialCharObj.left,
+                  initialCharObj.top,
+                  finalCharObj.left,
+                  finalCharObj.top
+                ))
+
+                let index = this.initialTextData.indexOf(initialCharObj)
+                this.initialTextData.splice(index, 1)
+                return
+              }
+            })
+            if (found === false) {
+              var offscreenCoords = this.getOffScreenCoords()
+              this.allChars.push(this.getTransitionChar(
+                finalCharObj.character,
+                offscreenCoords[0],
+                offscreenCoords[1],
+                finalCharObj.left,
+                finalCharObj.top
+              ))
+            }
+          })
+
+          this.initialTextData.forEach((initialCharObj, i) => {
+            var offscreenCoords = this.getOffScreenCoords()
+            this.allChars.push(this.getTransitionChar(
+              initialCharObj.character,
+              initialCharObj.left,
+              initialCharObj.left,
+              offscreenCoords[0],
+              offscreenCoords[1]
+            ))
+          })
+
+          this.finalTextData = characterArray
+          this.displayAllChars(destination)
+        }
+
+        displayChar(character, destination) {
+          let characterSpan = document.createElement("span")
+          characterSpan.innerHTML = character
+          destination.appendChild(characterSpan)
+          return characterSpan
+        }
+
+        getCharAnimation(char) {
+
+        }
+
+        displayAllChars(destination) {
+          destination.innerHTML = ''
+
+          this.allChars.forEach((char, i) => {
+            let charSpan = document.createElement("span")
+            charSpan.innerHTML = char.character
+            charSpan.className = "boo"
+            let styles = document.styleSheets
+            let animation = styles[1].cssRules[1]
+            animation.appendRule("0% { left:" + char.x1 + "px; top: " + char.y1 + "px; }")
+            animation.appendRule("100% { left:" + char.x2 + "px; top: " + char.y2 + "px; }")
+            charSpan.style.animationDuration = "2s"
+            charSpan.style.animationName = "anagramize"
+            charSpan.style.left = char.x2 + "px"
+            charSpan.style.top = char.y2 + "px"
+            debugger
+            destination.appendChild(charSpan)
+          })
+        }
+
+        updateFinalText(finalText) {
+          this.finalText = finalText
+        }
+      }
+
+      let currentAnagram,
+          initialTextForm = document.getElementById("initial-text-form"),
+          initialTextInput = document.getElementById("initial-text"),
+          finalTextForm = document.getElementById("final-text-form"),
+          finalTextInput = document.getElementById("final-text"),
+          textDisplay = document.getElementById("text-display")
+
+      initialTextForm.addEventListener("submit", (e) => {
+        e.preventDefault()
+        currentAnagram = new Anagram(initialTextInput.value)
+        currentAnagram.processInitialChars(textDisplay)
+      })
+
+      finalTextForm.addEventListener("submit", (e) => {
+        e.preventDefault()
+        if (currentAnagram) {
+          currentAnagram.updateFinalText(finalTextInput.value)
+          currentAnagram.processFinalChars(textDisplay)
+        }
+      })
+
+    </script>
+  </body>
+</html>
