@@ -16,8 +16,7 @@ class Anagram {
     document.getElementById(this.lastState).className += " invisible"
     document.getElementById(stateKey).className = "anagram-container"
     charsToDisplay.forEach((char, i) => {
-      let generatedChar = { x: 0, y: 0 }
-      let prevChar = this.getPrevChar(char.char) || generatedChar
+      let prevChar = this.getPrevChar(char.char) || this.generateRandomCharObj()
       let xStep = (char.x - prevChar.x) / this.config.nSteps
       let yStep = (char.y - prevChar.y) / this.config.nSteps
       let animatedChar = {
@@ -42,6 +41,12 @@ class Anagram {
     } else {
       this.counter = 0
     }
+  }
+
+  generateRandomCharObj() {
+    let x = this.config.container.width * 2 * Math.random() - this.config.container.width
+    let y = this.config.container.height * 2 * Math.random() - this.config.container.height
+    return { x: x, y: y }
   }
 
   getAnimation(char) {
@@ -78,7 +83,7 @@ class Anagram {
           newContainer.className = "anagram-container invisible"
       this.config.container.appendChild(newContainer)
       this.renderState(stateKey, newContainer)
-      
+
       if (!this.lastState) {
         this.lastState = stateKey
         newContainer.className = "anagram-container"
