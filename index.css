@@ -2,20 +2,21 @@ body {
   overflow: hidden;
   text-align: center;
   padding-top: 100px;
+  font-family: 'Playfair Display'
 }
 
-#app {
-}
+.container {}
 
 .char, .word {
   display: inline-block;
 }
 
 .anagram-container {
-  position: absolute;
-  width: 100%;
+  width: 300px;
+  margin: 0 auto;
 }
 
 .invisible {
+  position: absolute;
   opacity: 0;
 }

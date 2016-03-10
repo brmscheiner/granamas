@@ -73,18 +73,15 @@ class Anagram {
     let stateKeys = Object.keys(this.config.states)
 
     stateKeys.forEach((stateKey, i) => {
+      let newContainer = this.config.container.cloneNode()
+          newContainer.id = stateKey
+          newContainer.className = "anagram-container invisible"
+      this.config.container.appendChild(newContainer)
+      this.renderState(stateKey, newContainer)
+      
       if (!this.lastState) {
-        this.config.container.className = "anagram-container"
-        this.config.container.id = stateKey
-        this.renderState(stateKey, this.config.container)
         this.lastState = stateKey
-      } else {
-        let newContainer = this.config.container.cloneNode()
-            newContainer.id = stateKey
-            newContainer.style = this.config.container.style
-            newContainer.className = "anagram-container invisible"
-        document.body.appendChild(newContainer)
-        this.renderState(stateKey, newContainer)
+        newContainer.className = "anagram-container"
       }
     })
   }
