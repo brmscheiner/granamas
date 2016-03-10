@@ -10,11 +10,11 @@ class Anagram {
   }
 
   animateTo(stateKey) {
-    console.log(stateKey)
     this.config.nSteps = this.config.duration * 60 // 60 fps
     this.counter = this.config.nSteps
     let charsToDisplay = this.charData[stateKey]
-    this.config.container.innerHTML = ''
+    document.getElementById(this.lastState).className += " invisible"
+    document.getElementById(stateKey).className = "anagram-container"
     charsToDisplay.forEach((char, i) => {
       let generatedChar = { x: 0, y: 0 }
       let prevChar = this.getPrevChar(char.char) || generatedChar
@@ -26,10 +26,10 @@ class Anagram {
         yStep: yStep
       }
       this.animationData.push(animatedChar)
-      this.config.container.appendChild(char.element)
     })
-    window.requestAnimationFrame(() => this.animateStep())
+    this.lastState = stateKey
     this.resetUsedChars()
+    window.requestAnimationFrame(() => this.animateStep())
   }
 
   animateStep(timestamp) {
@@ -75,10 +75,12 @@ class Anagram {
     stateKeys.forEach((stateKey, i) => {
       if (!this.lastState) {
         this.config.container.className = "anagram-container"
+        this.config.container.id = stateKey
         this.renderState(stateKey, this.config.container)
         this.lastState = stateKey
       } else {
         let newContainer = this.config.container.cloneNode()
+            newContainer.id = stateKey
             newContainer.style = this.config.container.style
             newContainer.className = "anagram-container invisible"
         document.body.appendChild(newContainer)
@@ -111,7 +113,7 @@ class Anagram {
       wordSpan.className = "word"
       let charArray = word.split('')
       if (i < wordArray.length - 1) {
-        charArray.push(' ')
+        charArray.push('&nbsp')
       }
       charArray.forEach((char, i) => {
         let charSpan = document.createElement("span")

@@ -4,7 +4,10 @@ body {
   padding-top: 100px;
 }
 
-.char {
+#app {
+}
+
+.char, .word {
   display: inline-block;
 }
 
