@@ -4,6 +4,10 @@ body {
   padding-top: 100px;
 }
 
+.char {
+  display: inline-block;
+}
+
 .anagram-container {
   position: absolute;
   width: 100%;

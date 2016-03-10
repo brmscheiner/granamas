@@ -2,6 +2,7 @@
 
 class Anagram {
   constructor() {
+    this.animationData = []
     this.config = {}
     this.counter = 0
     this.charData = []
@@ -11,38 +12,60 @@ class Anagram {
   animateTo(stateKey) {
     console.log(stateKey)
     this.config.nSteps = this.config.duration * 60 // 60 fps
+    this.counter = this.config.nSteps
     let charsToDisplay = this.charData[stateKey]
+    this.config.container.innerHTML = ''
     charsToDisplay.forEach((char, i) => {
-      console.log(char)
-      // i.xStep = (i["state2"].x - i["state1"].x)/config.nSteps + i["state1"].x
-      // i.yStep = (i["state2"].y - i["state1"].y)/config.nSteps + i["state1"].y
+      let generatedChar = { x: 0, y: 0 }
+      let prevChar = this.getPrevChar(char.char) || generatedChar
+      let xStep = (char.x - prevChar.x) / this.config.nSteps
+      let yStep = (char.y - prevChar.y) / this.config.nSteps
+      let animatedChar = {
+        element: char.element,
+        xStep: xStep,
+        yStep: yStep
+      }
+      this.animationData.push(animatedChar)
+      this.config.container.appendChild(char.element)
     })
-
-    // window.requestAnimationFrame()
+    window.requestAnimationFrame(() => this.animateStep())
+    this.resetUsedChars()
   }
 
-  step(timestamp) {
-    for (i=0; i<allChars.length; i++) {
-      this.animationControl(i)
-    }
-    if (this.counter < this.config.nSteps) {
-      requestAnimationFrame(this.step)
-      this.counter++
+  animateStep(timestamp) {
+    this.animationData.forEach((char, i) => {
+      this.getAnimation(char)
+    })
+    if (this.counter > 0) {
+      requestAnimationFrame(() => this.animateStep())
+      this.counter -= 1
     } else {
       this.counter = 0
     }
   }
 
-  animationControl(charObj) {
-    element.style.transform = "translate(" + i.xStep + "px, " + i.yStep + "px)"
+  getAnimation(char) {
+    char.element.style.transform = "translate(" + char.xStep * this.counter + "px, " + char.yStep * this.counter + "px)"
   }
 
   getCharData(charSpan) {
     let charData = {}
+    charData.element = charSpan
     charData.char = charSpan.innerHTML
     charData.x = charSpan.offsetLeft
     charData.y = charSpan.offsetTop
     return charData
+  }
+
+  getPrevChar(char) {
+    let prevChars = this.charData[this.lastState]
+    for (let i = 0; i < prevChars.length; i++) {
+      if (!prevChars[i].used && prevChars[i].char === char) {
+        prevChars[i].used = true
+        return prevChars[i]
+      }
+    }
+    return null
   }
 
   initialize(configDictionary) {
@@ -70,6 +93,14 @@ class Anagram {
     container.top = this.config.container.offsetTop
     let charSpans = this.separateChars(text, container)
     this.charData[stateKey] = charSpans.map((charSpan) => this.getCharData(charSpan))
+  }
+
+  resetUsedChars() {
+    for (let state in this.charData) {
+      this.charData[state].forEach((char, j) => {
+        delete char.used
+      })
+    }
   }
 
   separateChars(text, container) {
