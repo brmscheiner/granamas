@@ -1,3 +1,14 @@
 body {
-  overflow: hidden
+  overflow: hidden;
+  text-align: center;
+  padding-top: 100px;
+}
+
+.anagram-container {
+  position: absolute;
+  width: 100%;
+}
+
+.invisible {
+  opacity: 0;
 }

@@ -10,11 +10,14 @@ class Anagram {
 
   animateTo(stateKey) {
     console.log(stateKey)
-    config.nSteps = config.duration * 60 // 60 fps
-    for (i=0; i<this.allChars.length; i++) { // this is pseudocode
-      i.xStep = (i["state2"].x - i["state1"].x)/config.nSteps + i["state1"].x
-      i.yStep = (i["state2"].y - i["state1"].y)/config.nSteps + i["state1"].y
-    }
+    this.config.nSteps = this.config.duration * 60 // 60 fps
+    let charsToDisplay = this.charData[stateKey]
+    charsToDisplay.forEach((char, i) => {
+      console.log(char)
+      // i.xStep = (i["state2"].x - i["state1"].x)/config.nSteps + i["state1"].x
+      // i.yStep = (i["state2"].y - i["state1"].y)/config.nSteps + i["state1"].y
+    })
+
     // window.requestAnimationFrame()
   }
 
@@ -31,7 +34,7 @@ class Anagram {
   }
 
   animationControl(charObj) {
-    element.style.transform = "translate(" + i.xStep +"px, " + i.yStep + "px)"
+    element.style.transform = "translate(" + i.xStep + "px, " + i.yStep + "px)"
   }
 
   getCharData(charSpan) {
@@ -48,42 +51,46 @@ class Anagram {
 
     stateKeys.forEach((stateKey, i) => {
       if (!this.lastState) {
-        this.renderState(stateKey, "visible")
+        this.config.container.className = "anagram-container"
+        this.renderState(stateKey, this.config.container)
         this.lastState = stateKey
       } else {
-        this.renderState(stateKey, "hidden")
+        let newContainer = this.config.container.cloneNode()
+            newContainer.style = this.config.container.style
+            newContainer.className = "anagram-container invisible"
+        document.body.appendChild(newContainer)
+        this.renderState(stateKey, newContainer)
       }
     })
   }
 
-  renderState(stateKey, display) {
+  renderState(stateKey, container) {
     let text = this.config.states[stateKey]
-    let charSpans = this.separateChars(text)
+    container.left = this.config.container.offsetLeft
+    container.top = this.config.container.offsetTop
+    let charSpans = this.separateChars(text, container)
     this.charData[stateKey] = charSpans.map((charSpan) => this.getCharData(charSpan))
   }
 
-  separateChars(text) {
+  separateChars(text, container) {
     let wordArray = text.split(' ')
     let charSpans = []
     wordArray.forEach((word, i) => {
       let wordSpan = document.createElement("span")
-          wordSpan.className = "word"
+      wordSpan.className = "word"
       let charArray = word.split('')
-          charArray.push(' ')
+      if (i < wordArray.length - 1) {
+        charArray.push(' ')
+      }
       charArray.forEach((char, i) => {
         let charSpan = document.createElement("span")
-            charSpan.className = "char"
-            charSpan.innerHTML = char
+        charSpan.className = "char"
+        charSpan.innerHTML = char
         wordSpan.appendChild(charSpan)
         charSpans.push(charSpan)
       })
-      this.config.container.appendChild(wordSpan)
+      container.appendChild(wordSpan)
     })
     return charSpans
   }
-
-
-
-
-
 }
