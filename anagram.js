@@ -9,6 +9,80 @@ class Anagram {
     this.lastState = null
   }
 
+  initialize(configDictionary) {
+    /* Save the configDictionary, calculate the (x,y) positions of characters
+    in each state, and set the lastState. */
+    this.config = configDictionary
+    let stateKeys = Object.keys(this.config.states)
+
+    stateKeys.forEach((stateKey, i) => {
+      let newContainer = this.config.container.cloneNode()
+          newContainer.id = stateKey
+          newContainer.className = "anagram-container invisible"
+      this.config.container.appendChild(newContainer)
+      this.renderState(stateKey, newContainer)
+
+      /* is this just setting this.lastState to the first state in config.states?
+      possibly an opportunity for refactoring.. */
+      if (!this.lastState) {
+        this.lastState = stateKey
+        newContainer.className = "anagram-container"
+      }
+    })
+  }
+
+  renderState(stateKey, container) {
+    /* Populate charData array with the characters and (x,y) coordinates for
+    the text in config.states[stateKey] */
+    let text = this.config.states[stateKey]
+    container.left = this.config.container.offsetLeft
+    container.top = this.config.container.offsetTop
+    let charSpans = this.separateChars(text, container)
+    console.log(charSpans)
+    this.charData[stateKey] = charSpans.map((charSpan) => this.getCharData(charSpan))
+  }
+
+  separateChars(text, container) {
+    /* Return charSpans, an array which holds each character in text tagged
+    with its (x,y) position in the container. */
+    let charSpans = []
+
+    let lineArray = text.split("\n")
+    let lineDivs = []
+    lineArray.forEach((line,i) => {
+      let lineDiv = document.createElement("div")
+      lineDiv.className = "block"
+      let wordArray = line.split(' ')
+      wordArray.forEach((word, i) => {
+        let wordSpan = document.createElement("span")
+        wordSpan.className = "word"
+        let charArray = word.split('')
+        if (i < wordArray.length - 1) {
+          charArray.push('&nbsp')
+        }
+        charArray.forEach((char, i) => {
+          let charSpan = document.createElement("span")
+          charSpan.className = "char"
+          charSpan.innerHTML = char
+          wordSpan.appendChild(charSpan)
+          charSpans.push(charSpan)
+        })
+        lineDiv.appendChild(wordSpan)
+      })
+      container.appendChild(lineDiv)
+    })
+    return charSpans
+  }
+
+  getCharData(charSpan) {
+    let charData = {}
+    charData.element = charSpan
+    charData.char = charSpan.innerHTML
+    charData.x = charSpan.offsetLeft
+    charData.y = charSpan.offsetTop
+    return charData
+  }
+
   animateTo(stateKey) {
     this.config.nSteps = this.config.duration * 60 // 60 fps
     this.counter = this.config.nSteps
@@ -53,15 +127,6 @@ class Anagram {
     char.element.style.transform = "translate(" + char.xStep * this.counter + "px, " + char.yStep * this.counter + "px)"
   }
 
-  getCharData(charSpan) {
-    let charData = {}
-    charData.element = charSpan
-    charData.char = charSpan.innerHTML
-    charData.x = charSpan.offsetLeft
-    charData.y = charSpan.offsetTop
-    return charData
-  }
-
   getPrevChar(char) {
     let prevChars = this.charData[this.lastState]
     for (let i = 0; i < prevChars.length; i++) {
@@ -73,59 +138,12 @@ class Anagram {
     return null
   }
 
-  initialize(configDictionary) {
-    this.config = configDictionary
-    let stateKeys = Object.keys(this.config.states)
-
-    stateKeys.forEach((stateKey, i) => {
-      let newContainer = this.config.container.cloneNode()
-          newContainer.id = stateKey
-          newContainer.className = "anagram-container invisible"
-      this.config.container.appendChild(newContainer)
-      this.renderState(stateKey, newContainer)
-
-      if (!this.lastState) {
-        this.lastState = stateKey
-        newContainer.className = "anagram-container"
-      }
-    })
-  }
-
-  renderState(stateKey, container) {
-    let text = this.config.states[stateKey]
-    container.left = this.config.container.offsetLeft
-    container.top = this.config.container.offsetTop
-    let charSpans = this.separateChars(text, container)
-    this.charData[stateKey] = charSpans.map((charSpan) => this.getCharData(charSpan))
-  }
-
   resetUsedChars() {
+    /* Reset all used flags in charData */
     for (let state in this.charData) {
       this.charData[state].forEach((char, j) => {
         delete char.used
       })
     }
-  }
-
-  separateChars(text, container) {
-    let wordArray = text.split(' ')
-    let charSpans = []
-    wordArray.forEach((word, i) => {
-      let wordSpan = document.createElement("span")
-      wordSpan.className = "word"
-      let charArray = word.split('')
-      if (i < wordArray.length - 1) {
-        charArray.push('&nbsp')
-      }
-      charArray.forEach((char, i) => {
-        let charSpan = document.createElement("span")
-        charSpan.className = "char"
-        charSpan.innerHTML = char
-        wordSpan.appendChild(charSpan)
-        charSpans.push(charSpan)
-      })
-      container.appendChild(wordSpan)
-    })
-    return charSpans
   }
 }
