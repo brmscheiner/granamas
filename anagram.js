@@ -38,7 +38,6 @@ class Anagram {
     container.left = this.config.container.offsetLeft
     container.top = this.config.container.offsetTop
     let charSpans = this.separateChars(text, container)
-    console.log(charSpans)
     this.charData[stateKey] = charSpans.map((charSpan) => this.getCharData(charSpan))
   }
 
@@ -90,15 +89,15 @@ class Anagram {
     document.getElementById(this.lastState).className += " invisible"
     document.getElementById(stateKey).className = "anagram-container"
     charsToDisplay.forEach((char, i) => {
-      let prevChar = this.getPrevChar(char.char) || this.generateRandomCharObj()
-      let xStep = (char.x - prevChar.x) / this.config.nSteps
+      let prevChar = this.getPrevChar(char.char) || this.generateRandomOffset()
+      let xStep = 5*(char.x - prevChar.x) / this.config.nSteps
       let yStep = (char.y - prevChar.y) / this.config.nSteps
       let animatedChar = {
         element: char.element,
         xStep: xStep,
         yStep: yStep
       }
-      this.animationData.push(animatedChar)
+      this.animationData.push(animatedChar) // does this ever get emptied out?
     })
     this.lastState = stateKey
     this.resetUsedChars()
@@ -117,7 +116,8 @@ class Anagram {
     }
   }
 
-  generateRandomCharObj() {
+  generateRandomOffset() {
+    /* Generate coordinates within the box or above it and to its left? */
     let x = this.config.container.width * 2 * Math.random() - this.config.container.width
     let y = this.config.container.height * 2 * Math.random() - this.config.container.height
     return { x: x, y: y }
@@ -128,6 +128,7 @@ class Anagram {
   }
 
   getPrevChar(char) {
+    /* returns an unused character from the last state matching the input character */
     let prevChars = this.charData[this.lastState]
     for (let i = 0; i < prevChars.length; i++) {
       if (!prevChars[i].used && prevChars[i].char === char) {
@@ -139,7 +140,7 @@ class Anagram {
   }
 
   resetUsedChars() {
-    /* Reset all used flags in charData */
+    /* Reset all "used" flags in charData */
     for (let state in this.charData) {
       this.charData[state].forEach((char, j) => {
         delete char.used
@@ -147,3 +148,8 @@ class Anagram {
     }
   }
 }
+
+
+/* Animation ideas:
+ - a two part animation where the letters exit and slide, then enter.
+*/
