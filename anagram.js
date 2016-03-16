@@ -83,6 +83,7 @@ class Anagram {
   }
 
   animateTo(stateKey) {
+    this.animationData = []
     this.config.nSteps = this.config.duration * 60 // 60 fps
     this.counter = this.config.nSteps
     let charsToDisplay = this.charData[stateKey]
@@ -106,7 +107,7 @@ class Anagram {
 
   animateStep(timestamp) {
     this.animationData.forEach((char, i) => {
-      this.getAnimation(char)
+      this.animateChar(char)
     })
     if (this.counter > 0) {
       requestAnimationFrame(() => this.animateStep())
@@ -123,7 +124,7 @@ class Anagram {
     return { x: x, y: y }
   }
 
-  getAnimation(char) {
+  animateChar(char) {
     char.element.style.transform = "translate(" + char.xStep * this.counter + "px, " + char.yStep * this.counter + "px)"
   }
 
